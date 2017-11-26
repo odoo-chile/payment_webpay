@@ -9,15 +9,17 @@ from openerp import api, models, fields, _
 from openerp.tools import float_round, DEFAULT_SERVER_DATE_FORMAT
 from openerp.tools.float_utils import float_compare, float_repr
 from openerp.tools.safe_eval import safe_eval
+from openerp.exceptions import Warning as UserError
+
 from base64 import b64decode
 
 _logger = logging.getLogger(__name__)
-try:
+if True:  # try:
     from suds.client import Client
     from suds.wsse import Security, Timestamp
     from .wsse.suds import WssePlugin
     from suds.transport.https import HttpTransport
-except:
+else:  # except:
     _logger.info("No Load suds or wsse")
 
 URLS ={
@@ -67,25 +69,33 @@ class PaymentAcquirerWebpay(models.Model):
         return url
 
     @api.multi
-    def webpay_form_generate_values(self, values):
-        base_url = self.env['ir.config_parameter'].sudo().get_param('web.base.url')
-        values.update({
+    def webpay_form_generate_values(self, partner_values, tx_values):
+        # raise UserError(partner_values)
+        base_url = self.env['ir.config_parameter'].sudo().get_param(
+            'web.base.url')
+        tx_values.update({
             'business': self.company_id.name,
-            'item_name': '%s: %s' % (self.company_id.name, values['reference']),
-            'item_number': values['reference'],
-            'amount': values['amount'],
-            'currency_code': values['currency'] and values['currency'].name or '',
-            'address1': values.get('partner_address'),
-            'city': values.get('partner_city'),
-            'country': values.get('partner_country') and values.get('partner_country').code or '',
-            'state': values.get('partner_state') and (values.get('partner_state').code or values.get('partner_state').name) or '',
-            'email': values.get('partner_email'),
-            'zip_code': values.get('partner_zip'),
-            'first_name': values.get('partner_first_name'),
-            'last_name': values.get('partner_last_name'),
-            'return_url': base_url + '/payment/webpay/final'
+            'item_name': '%s: %s' % (
+                self.company_id.name, tx_values['reference']),
+            'item_number': tx_values['reference'],
+            'amount': tx_values['amount'],
+            'currency_code': tx_values['currency'] and tx_values[
+                'currency'].name or '',
+            'address1': partner_values.get('address'),
+            'city': partner_values.get('city'),
+            'country': partner_values.get('country') and partner_values.get(
+                'country').code or '',
+            'state': partner_values.get('state') and (
+                partner_values.get('state').code or partner_values.get(
+                    'state').name) or '',
+            'email': partner_values.get('email'),
+            'zip_code': partner_values.get('zip'),
+            'first_name': partner_values.get('first_name'),
+            'last_name': partner_values.get('last_name'),
+            'return_url': base_url + '/payment/webpay/final',
         })
-        return values
+        # raise UserError(tx_values)
+        return partner_values, tx_values
 
     @api.multi
     def webpay_get_form_action_url(self,):
@@ -177,8 +187,8 @@ class PaymentTxWebpay(models.Model):
         client = acquirer_id.get_client()
         client.options.cache.clear()
 
-    	transactionResultOutput = client.service.getTransactionResult(token)
-    	acknowledge = self.acknowledgeTransaction(acquirer_id, token)
+        transactionResultOutput = client.service.getTransactionResult(token)
+        acknowledge = self.acknowledgeTransaction(acquirer_id, token)
 
         return transactionResultOutput
 
@@ -243,5 +253,8 @@ class PaymentTxWebpay(models.Model):
             res.update(state='error', state_message=error)
             return tx.write(res)
 
+
+'''
 class PaymentMethod(models.Model):
     _inherit = 'payment.method'
+'''

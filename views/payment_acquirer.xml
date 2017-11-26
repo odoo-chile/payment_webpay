@@ -10,7 +10,7 @@
               <field name="environment" position="after">
                 <field name="webpay_mode" attrs="{'invisible':[('provider','!=','webpay')]}"/>
               </field>
-                <xpath expr='//group[@name="acquirer"]' position='after'>
+                <xpath expr='//group[@name="acquirer_display"]' position='after'>
                   <group>
                     <field name="webpay_commer_code" />
                   </group>

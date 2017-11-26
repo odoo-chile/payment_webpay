@@ -1,15 +1,14 @@
 # -*- coding: utf-8 -*-
-
 {
     'name': 'Webpay Payment Acquirer',
     'category': 'Accounting',
     'author': 'Daniel Santibáñez Polanco',
     'summary': 'Payment Acquirer: Webpay Implementation',
     'website': 'https://odoocoop.cl',
-    'version': "9.1.0.0",
+    'version': "8.0.1.0.0",
     'description': """Webpay Payment Acquirer""",
-    'depends': ['payment'],
-    'python-depends':[
+    'depends': ['payment', 'website_sale'],
+    'python-depends': [
         'suds',
         'py-wsse',
         # En Debian/Ubuntu:
