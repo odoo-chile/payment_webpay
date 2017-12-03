@@ -10,6 +10,7 @@ from openerp.tools import float_round, DEFAULT_SERVER_DATE_FORMAT
 from openerp.tools.float_utils import float_compare, float_repr
 from openerp.tools.safe_eval import safe_eval
 from openerp.exceptions import Warning as UserError
+import pytz
 
 from base64 import b64decode
 
@@ -94,7 +95,6 @@ class PaymentAcquirerWebpay(models.Model):
             'last_name': partner_values.get('last_name'),
             'return_url': base_url + '/payment/webpay/final',
         })
-        # raise UserError(tx_values)
         return partner_values, tx_values
 
     @api.multi
@@ -167,14 +167,23 @@ class PaymentTxWebpay(models.Model):
     _inherit = 'payment.transaction'
 
     webpay_txn_type = fields.Selection([
-            ('VD','Venta Debito'),
-            ('VN','Venta Normal'),
-            ('VC','Venta en cuotas'),
-            ('SI','3 cuotas sin interés'),
-            ('S2','cuotas sin interés'),
-            ('NC','N Cuotas sin interés'),
+            ('VD','Débito'),
+            ('VN','Crédito sin cuotas'),
+            ('VC','Crédito en cuotas'),
+            ('SI','Crédito, 3 cuotas sin interés'),
+            ('S2','Crédito, cuotas sin interés'),
+            ('NC','Crédito, Cuotas sin interés'),
         ],
        string="Webpay Tipo Transacción")
+    card_detail = fields.Char("Card Detail")
+    shares_amount = fields.Float("Shares Amount")
+    shares_number = fields.Integer("Qty of Shares")
+    vci = fields.Selection([
+        ('TSY', 'Autenticación exitosa'), ('TSN', 'Autenticación fallida'),
+        ('TO6', 'Tiempo máximo excedido para autenticación'),
+        ('ABO', 'Autenticación abortada por tarjetahabiente'),
+        ('U3', 'Error interno en la autenticación'),
+        ('', 'N/A')], default='', string="VCI")
 
     """
     getTransaction
@@ -186,7 +195,6 @@ class PaymentTxWebpay(models.Model):
     def getTransaction(self, acquirer_id, token):
         client = acquirer_id.get_client()
         client.options.cache.clear()
-
         transactionResultOutput = client.service.getTransactionResult(token)
         acknowledge = self.acknowledgeTransaction(acquirer_id, token)
 
@@ -236,13 +244,28 @@ class PaymentTxWebpay(models.Model):
             }
         status = str(data.detailOutput[0].responseCode)
         _logger.info('#####..--info--..##### %s' % status)
+        # utctime = pytz.timezone('Etc/GMT+3')
+        # date_time = data.transactionDate.replace(tzinfo=utctime)
+        # date_time = utctime.normalize(date_time)
+        date_time = (data.transactionDate + datetime.timedelta(0, 10800)).strftime("%Y-%m-%d %H:%M:%S")
+        _logger.info('··········########### DATETIME %s' % date_time)
         res = {
             'acquirer_reference': data.detailOutput[0].authorizationCode,
             'webpay_txn_type': data.detailOutput[0].paymentTypeCode,
+            'card_detail': data.cardDetail['cardNumber'],
         }
+        try:
+            res.update(vci=data.VCI)
+        except AttributeError:
+            _logger.info('VCI no informado')
         if status in ['0']:
             _logger.info('Validated webpay payment for tx %s: set as done' % (tx.reference))
-            res.update(state='done', date_validate=data.transactionDate)
+            res.update(state='done', date_validate=date_time)
+            try:
+                res.update(shares_amount=data.detailOutput[0].sharesAmount,
+                           shares_number=data.detailOutput[0].sharesNumber)
+            except AttributeError:
+                res.update(shares_amount=0, shares_number=0)
             return tx.write(res)
         elif status in ['-6', '-7']:
             _logger.info('Received notification for webpay payment %s: set as pending' % (tx.reference))

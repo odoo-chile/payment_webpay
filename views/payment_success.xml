@@ -87,7 +87,7 @@
                                             <strong>Fecha y hora:</strong>
                                         </td>
                                         <td class="text-right" style="padding-right: 10px;">
-                                            <span t-field="order.payment_tx_id.date_create"/><br />
+                                            <span t-field="order.payment_tx_id.date_validate"/><br />
                                         </td>
                                     </tr>
                                 </tbody>

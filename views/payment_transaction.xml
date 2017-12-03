@@ -10,6 +10,13 @@
                     <page string="Webpay TX Details">
                         <group>
                             <field name="webpay_txn_type" />
+                            <field name="shares_amount"
+                                    attrs="{'invisible':[('webpay_txn_type','in',['VD', 'VN'])]}"/>
+                            <field name="shares_number"
+                                    attrs="{'invisible':[('webpay_txn_type','in',['VD', 'VN'])]}"/>
+                            <field name="card_detail"/>
+                            <field name="vci"
+                                attrs="{'invisible':[('vci','=','')]}"/>
                         </group>
                     </page>
                 </xpath>

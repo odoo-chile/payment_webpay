@@ -67,7 +67,7 @@
         </template>
 
         <template id="webpay_redirect" name="webpay_redirect">
-          <t t-raw="webpay_redirect" />
+            <t t-raw="webpay_redirect" />
         </template>
     </data>
 </openerp>
