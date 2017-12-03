@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- aca tengo que declarar mi factura -->
+<openerp>
+    <data>
+        <template id="success" inherit_id="website_sale.confirmation">
+            <xpath expr="//h1[@class='mb32']" position="replace">
+            <h3>Pedido <span t-field="order.name"/> Confirmado</h3>
+            </xpath>
+            <xpath expr="//div[@class='col-md-8 oe_cart']" position="replace">
+                <div class="col-md-8 oe_cart">
+                    <h4>Detalle de su compra</h4>
+                    <div class="container oe_website_sale">
+                        <div class="row">
+                        <table class="table table-striped table-condensed" t-if="order and order.website_order_line">
+                        <thead>
+                            <tr>
+                                <th colspan="2" width="80">Producto</th>
+                                <th width="120">Cantidad</th>
+                                <th width="100">Precio</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr t-foreach="order.website_order_line" t-as="line">
+                                <td colspan="2" t-if="not line.product_id.product_tmpl_id"/>
+                                <td t-if="line.product_id.product_tmpl_id">
+                                    <a t-attf-href="/shop/product/#{ slug(line.product_id.product_tmpl_id) }">
+                                        <span t-field="line.product_id.image_small" t-field-options="{&quot;widget&quot;: &quot;image&quot;, &quot;class&quot;: &quot;img-rounded&quot;}"/>
+                                    </a>
+                                </td>
+                                <td t-if="line.product_id.product_tmpl_id">
+                                    <strong t-field="line.product_id.with_context(display_default_code=False).display_name"/>
+                                </td>
+                                <td>
+                                    <div t-esc="line.product_uom_qty"/>
+                                </td>
+                                <td class="text-right" style="padding-right: 10px;">
+                                    <span t-field="line.price_unit" style="white-space: nowrap;"
+                                          t-field-options="{
+                                              &quot;widget&quot;: &quot;monetary&quot;,
+                                              &quot;display_currency&quot;: &quot;user_id.partner_id.property_product_pricelist.currency_id&quot;,
+                                              &quot;from_currency&quot;: &quot;order.pricelist_id.currency_id&quot;
+                                           }"/>
+                                </td>
+
+                            </tr>
+                        </tbody>
+                        </table>
+                        </div>
+                        <div class="row">
+                            <table class="table table-striped table-condensed" t-if="order and order.website_order_line">
+                                <thead>
+                                    <tr>
+                                        <th style="width:1px"></th>
+                                        <th colspan="2" class="text-left">
+                                            <strong>Datos de la operación Transbank</strong>
+                                       </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td style="width:1px"></td>
+                                        <td class="text-left">
+                                            <strong>Monto total de la orden:</strong>
+                                        </td>
+                                        <td class="text-right" style="padding-right: 10px;">
+                                            <span t-field="order.payment_tx_id.currency_id.name"/>
+                                            <span t-field="order.amount_total"
+                                                  t-field-options="{
+                                                      &quot;widget&quot;: &quot;monetary&quot;,
+                                                      &quot;display_currency&quot;: &quot;user_id.partner_id.property_product_pricelist.currency_id&quot;,
+                                                      &quot;from_currency&quot;: &quot;order.pricelist_id.currency_id&quot;
+                                                   }"/>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td style="width:1px"></td>
+                                        <td class="text-left">
+                                            <strong>Referencia Transbank:</strong>
+                                        </td>
+                                        <td class="text-right" style="padding-right: 10px;">
+                                            <span t-field="order.payment_tx_id.acquirer_reference"/>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td style="width:1px"></td>
+                                        <td class="text-left">
+                                            <strong>Fecha y hora:</strong>
+                                        </td>
+                                        <td class="text-right" style="padding-right: 10px;">
+                                            <span t-field="order.payment_tx_id.date_create"/><br />
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </xpath>
+        </template>
+        <template id="fail">
+            The operation has failed
+        </template>
+        <template id="cancelled">
+            <t t-call="website.layout">
+                <t t-set="additional_title">Shop - Payment Webpay Cancelled</t>
+                <div class="container">
+                    <div class="row">
+                        <div class="col-lg-8 col-sm-9">
+                            <h1>
+                                El pago sobre su pedido <t t-esc="TBK_ORDEN_COMPRA"/> no ha sido cursado.
+                            </h1>
+                            <h5>
+                                Su orden sigue aún pendiente de pago. Permanecerá en su carro de compras durante 5 días.<br />
+                                Terminado dicho plazo, la orden será auto eliminada.<br /><br />
+                                <a href="/shop/cart">Intente nuevamente.</a>
+                            </h5><br /><br />
+                        </div>
+                    </div>
+                </div>
+            </t>
+        </template>
+    </data>
+</openerp>

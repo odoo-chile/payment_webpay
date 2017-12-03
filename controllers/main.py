@@ -7,6 +7,7 @@ import urllib2
 from openerp import http, SUPERUSER_ID
 from openerp.addons.web.http import request
 from openerp.addons.payment.models.payment_acquirer import ValidationError
+from openerp.exceptions import Warning as UserError
 
 _logger = logging.getLogger(__name__)
 
@@ -62,7 +63,7 @@ class WebpayController(http.Controller):
     ], type='http', auth='public', csrf=False, website=True)
     def webpay_form_feedback(self, acquirer_id=None, **post):
         """ Webpay contacts using GET, at least for accept """
-        _logger.info('Webpay: entering form_feedback with post data %s', pprint.pformat(post))  # debug
+        _logger.info('Webpay: ####### form_feedback data %s', pprint.pformat(post))  # debug
         cr, uid, context = request.cr, SUPERUSER_ID, request.context
         resp = request.registry['payment.transaction'].getTransaction(cr, uid, [], acquirer_id, post['token_ws'], context=context)
         '''
@@ -77,11 +78,19 @@ class WebpayController(http.Controller):
         urequest = urllib2.Request(resp.urlRedirection, werkzeug.url_encode({'token_ws': post['token_ws'], }))
         uopen = urllib2.urlopen(urequest)
         feedback = uopen.read()
-        if resp.VCI in ['TSY'] and str(resp.detailOutput[0].responseCode) in [ '0' ]:
-            values={
-                'webpay_redirect': feedback,
-            }
-            return request.website.render('payment_webpay.webpay_redirect', values)
+        jresp = dict(resp)
+        jresp['detailOutput'] = dict(resp.detailOutput[0])
+        jresp['cardDetail'] = dict(resp.cardDetail)
+        _logger.info('############ JRESP %s' % jresp)
+        # _logger.info('############ RESP VCI %s' % resp.VCI)
+        if resp.VCI in ['TSY'] and str(resp.detailOutput[0].responseCode) in ['0']:
+            if True:
+                return feedback
+            else:
+                values = {
+                    'webpay_redirect': feedback,
+                }
+                return request.website.render('payment_webpay.webpay_redirect', values)
         return werkzeug.utils.redirect('/shop/payment')
 
 
@@ -91,8 +100,10 @@ class WebpayController(http.Controller):
     ], type='http', auth='public', csrf=False, website=True)
     def final(self, **post):
         """ Webpay contacts using GET, at least for accept """
-        _logger.info('Webpay: entering End with post data %s', pprint.pformat(post))  # debug
+        _logger.info('Webpay: entering End with post data %s', pprint.pformat(post))
         cr, uid, context = request.cr, SUPERUSER_ID, request.context
+        # aca no puede ir el cancelled...
+        # return request.render('payment_webpay.cancelled', post)
         return werkzeug.utils.redirect('/shop/payment/validate')
 
 
@@ -120,7 +131,6 @@ class WebpayController(http.Controller):
             payment._webpay_s2s_validate(tx)
         except ValidationError:
             return 'ko'
-
         return 'ok'
 
     @http.route(['/payment/webpay/redirect'],  type='http', auth='public', methods=["POST"], csrf=False, website=True)
@@ -131,7 +141,10 @@ class WebpayController(http.Controller):
         urequest = urllib2.Request(result['url'], werkzeug.url_encode({'token_ws': result['token']}))
         uopen = urllib2.urlopen(urequest)
         resp = uopen.read()
-        values={
-            'webpay_redirect': resp,
-        }
-        return request.website.render('payment_webpay.webpay_redirect', values)
+        if True:
+            return resp
+        else:
+            values = {
+                'webpay_redirect': resp,
+            }
+            return request.website.render('payment_webpay.webpay_redirect', values)

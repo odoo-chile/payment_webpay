@@ -18,6 +18,7 @@
     ],
     'data': [
         'views/webpay.xml',
+        'views/payment_success.xml',
         'views/payment_acquirer.xml',
         'views/payment_transaction.xml',
         'data/webpay.xml',

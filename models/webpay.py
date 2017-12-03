@@ -235,6 +235,7 @@ class PaymentTxWebpay(models.Model):
                 '-8' : 'Rubro no autorizado.',
             }
         status = str(data.detailOutput[0].responseCode)
+        _logger.info('#####..--info--..##### %s' % status)
         res = {
             'acquirer_reference': data.detailOutput[0].authorizationCode,
             'webpay_txn_type': data.detailOutput[0].paymentTypeCode,
