@@ -2,12 +2,12 @@
 {
     'name': 'Webpay Payment Acquirer',
     'category': 'Accounting',
-    'author': 'Daniel Santibáñez Polanco',
+    'author': u'Daniel Santibáñez Polanco / Daniel Blanco - Blanco Martín & Asociados',
     'summary': 'Payment Acquirer: Webpay Implementation',
     'website': 'https://odoocoop.cl',
-    'version': "8.0.1.0.0",
+    'version': "8.0.2.0.0",
     'description': """Webpay Payment Acquirer""",
-    'depends': ['payment', 'website_sale'],
+    'depends': ['payment', 'website_sale', 'l10n_cl_invoice'],
     'python-depends': [
         'suds',
         'py-wsse',
@@ -19,6 +19,7 @@
     'data': [
         'views/webpay.xml',
         'views/payment_success.xml',
+        'views/payment_checkout.xml',
         'views/payment_acquirer.xml',
         'views/payment_transaction.xml',
         'data/webpay.xml',

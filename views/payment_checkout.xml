@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- aca tengo que declarar mi factura -->
+<openerp>
+    <data>
+        <template id="checkout" inherit_id="website_sale.checkout">
+
+
+            <xpath expr="//form[@action='/shop/confirm_order']/div/div/div[@class='row']/div[3]" position="replace"/>
+            <xpath expr="//form[@action='/shop/confirm_order']/div/div/div[@class='row']/div[6]" position="after">
+                <div t-attf-class="form-group #{error.get('street') and 'has-error' or ''} col-lg-6">
+                    <label class="control-label" for="street" style="font-weight: normal">Street1</label>
+                    <input type="text" name="street" class="form-control" t-att-value="checkout.get('street')"/>
+                </div>
+            </xpath>
+
+            <xpath expr="//form[@action='/shop/confirm_order']/div/div/div[@class='row']/div" position="replace">
+                <div t-attf-class="form-group #{error.get('name') and 'has-error' or ''} col-lg-12">
+                      <label class="control-label" for="contact_name">Your Name</label>
+                      <input type="text" name="name" class="form-control" t-att-value="checkout.get('name')"/>
+                  </div>
+            </xpath>
+            <xpath expr="//form[@action='/shop/confirm_order']/div/div/div[@class='row']/div" position="before">
+                <div t-attf-class="form-group #{error.get('is_company') and 'has-error' or ''} col-lg-6">
+                      <label class="control-label" for="is_company" style="font-weight: normal">Es Una Empresa</label>
+                      <input type="checkbox" name="is_company" t-att-value="checkout.get('is_company')"/>
+                </div>
+                <div t-attf-class="form-group col-lg-6">
+                      <label class="control-label" for="document_type" style="font-weight: normal">Factura/Boleta</label>
+                      <select class="form-control" name="document_type" value="boleta">
+                          <option value="boleta" select="select">Boleta</option>
+                          <option value="factura">Factura</option>
+                      </select>
+                </div>
+            </xpath>
+            <xpath expr="//label[@for='vat']" position="replace">
+                <label class="control-label" for="vat" style="font-weight: normal">RUT</label>
+            </xpath>
+            <!--<xpath expr="//label[@for='street']" position="replace">
+                <label class="control-label" for="vat" style="font-weight: normal">Calle 1</label>
+            </xpath>-->
+
+            <!--<xpath expr="//div/select[@name='state_id']" position="replace">
+                <select name="state_id" class="form-control">
+                    <option value="">seleccione su comuna...</option>
+                    <t t-foreach="states.sorted(key=lambda b: b.name) or []" t-as="state">
+                        <option t-att-value="state.id" style="display:none;"
+                                t-att-data-country_id="state.country_id.id"
+                                t-att-data-type="normal"
+                                t-att-value-selected="state.id == checkout.get('state_id')">
+                            <t t-esc="state.name"/>
+                        </option>
+                    </t>
+                </select>
+            </xpath>-->
+        </template>
+    </data>
+</openerp>

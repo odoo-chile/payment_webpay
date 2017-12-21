@@ -84,10 +84,35 @@
                                     <tr>
                                         <td style="width:1px"></td>
                                         <td class="text-left">
-                                            <strong>Fecha y hora:</strong>
+                                            <strong>Fecha y hora de aprobación:</strong>
                                         </td>
                                         <td class="text-right" style="padding-right: 10px;">
-                                            <span t-field="order.payment_tx_id.date_validate"/><br />
+                                            <span t-field="order.payment_tx_id.date_validate"/>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td style="width:1px"></td>
+                                        <td class="text-left">
+                                            <strong>Tipo de Operación:</strong>
+                                        </td>
+                                        <td class="text-right" style="padding-right: 10px;">
+                                            <span t-field="order.payment_tx_id.webpay_txn_type"/>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td style="width:1px"></td>
+                                        <td class="text-left">
+                                            <strong>Cantidad y valor de cuotas:</strong>
+                                        </td>
+                                        <td class="text-right" style="padding-right: 10px;">
+                                            <span t-field="order.payment_tx_id.shares_number"/> cuotas de
+                                            <span t-field="order.payment_tx_id.shares_amount"
+                                                   t-field-options="{
+                                                      &quot;widget&quot;: &quot;monetary&quot;,
+                                                      &quot;display_currency&quot;: &quot;user_id.partner_id.property_product_pricelist.currency_id&quot;,
+                                                      &quot;from_currency&quot;: &quot;order.pricelist_id.currency_id&quot;
+                                                   }"/>
+
                                         </td>
                                     </tr>
                                 </tbody>
