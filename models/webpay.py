@@ -26,7 +26,7 @@ else:  # except:
 URLS ={
     'integ': 'https://webpay3gint.transbank.cl/WSWebpayTransaction/cxf/WSWebpayService?wsdl',
     'test': 'https://webpay3gint.transbank.cl/WSWebpayTransaction/cxf/WSWebpayService?wsdl',
-    'prod': 'https://webpay3g.transbank.cl//WSWebpayTransaction/cxf/WSWebpayService?wsdl',
+    'prod': 'https://webpay3g.transbank.cl/WSWebpayTransaction/cxf/WSWebpayService?wsdl',
 }
 
 class PaymentAcquirerWebpay(models.Model):

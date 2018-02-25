@@ -32,9 +32,9 @@
                       </select>
                 </div>
             </xpath>
-            <xpath expr="//label[@for='vat']" position="replace">
+            <!--<xpath expr="//label[@for='vat']" position="replace">
                 <label class="control-label" for="vat" style="font-weight: normal">RUT</label>
-            </xpath>
+            </xpath>-->
             <!--<xpath expr="//label[@for='street']" position="replace">
                 <label class="control-label" for="vat" style="font-weight: normal">Calle 1</label>
             </xpath>-->

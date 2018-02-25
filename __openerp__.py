@@ -6,7 +6,6 @@
     'summary': 'Payment Acquirer: Webpay Implementation',
     'website': 'https://odoocoop.cl',
     'version': "8.0.2.0.0",
-    'description': """Webpay Payment Acquirer""",
     'depends': ['payment', 'website_sale', 'l10n_cl_invoice'],
     'python-depends': [
         'suds',

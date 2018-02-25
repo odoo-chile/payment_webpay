@@ -148,3 +148,4 @@ class WebpayController(http.Controller):
                 'webpay_redirect': resp,
             }
             return request.website.render('payment_webpay.webpay_redirect', values)
+
