@@ -150,14 +150,15 @@ class WebpayController(http.Controller):
             return request.website.render(
                 'payment_webpay.webpay_redirect', values)
 
+    """
     @http.route(
         ['/shop/confirm_order'], type='http', auth="public", website=True)
     def confirm_order(self, **post):
         cr, uid, context, registry = request.cr, request.uid, request.context, \
                                      request.registry
         order = request.website.sale_get_order(context=context)
-        # if not order:
-        #     return request.redirect("/shop")
+        if not order:
+            return request.redirect("/shop")
         # redirection = self.checkout_redirection(order)
         # if redirection:
         #     return redirection
@@ -169,3 +170,4 @@ class WebpayController(http.Controller):
         # request.session['sale_last_order_id'] = order.id
         # request.website.sale_get_order(update_pricelist=True, context=context)
         return request.redirect("/shop/payment")
+    """

@@ -3,16 +3,48 @@
 <openerp>
     <data>
         <template id="checkout" inherit_id="website_sale.checkout">
-
-
+            <xpath expr="//div[@id='wrap']" position="before">
+                <link rel="stylesheet" href="/payment_webpay/static/src/css/style.css"/>
+            </xpath>
+            <xpath expr="//div[@id='wrap']" position="after">
+                <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"/>
+                <script data-main="scripts/main" src="scripts/require.js"></script>
+                <script src="/payment_webpay/static/src/js/scripts.js"/>
+            </xpath>
+            <xpath expr="//form" position="attributes">
+                <attribute name="id">checkout_form</attribute>
+            </xpath>
+            <xpath expr="//form[@action='/shop/confirm_order']/div/div/div[@class='row']/div[3]" position="after">
+                <div class="alert alert-danger alert-dismissable" id="alert1">
+                    <a class="close" data-dismiss="alert">×</a>
+                    <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"/>
+                    <span>El RUT que ha ingresado no es válido. Por favor, ingrese uno correcto para poder efectuar la facturación.</span>
+                </div>
+                <div class="alert alert-danger alert-dismissable" id="alert2">
+                    <a class="close" data-dismiss="alert">×</a>
+                    <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"/>
+                    <span>El RUT que ha ingresado ya está en nuestro sistema. Por favor, <a href="/web/login">ingrese con su cuenta (email).</a> En Caso que no recuerde, la contraseña, puede recuperarla con la opción "restablecer contraseña".</span>
+                </div>
+                <div class="alert alert-danger alert-dismissable" id="alert3">
+                    <a class="close" data-dismiss="alert">×</a>
+                    <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"/>
+                    <span>El email que ha ingresado ya está en nuestro sistema. Por favor, <a href="/web/login">ingrese con su cuenta (email).</a> En Caso que no recuerde, la contraseña, puede recuperarla con la opción "restablecer contraseña".</span>
+                </div>
+            </xpath>
             <xpath expr="//form[@action='/shop/confirm_order']/div/div/div[@class='row']/div[3]" position="replace"/>
-            <xpath expr="//form[@action='/shop/confirm_order']/div/div/div[@class='row']/div[6]" position="after">
+            <xpath expr="//form[@action='/shop/confirm_order']/div/div/div[@class='row']/div[8]" position="after">
+                <div t-attf-class="form-group #{error.get('street2') and 'has-error' or ''} col-lg-6">
+                    <label class="control-label" for="street2">Piso Dpto</label>
+                    <input type="text" name="street2" class="form-control" t-att-value="checkout.get('street2')"/>
+                </div>
+            </xpath>
+            <xpath expr="//form[@action='/shop/confirm_order']/div/div/div[@class='row']/div[8]" position="after">
                 <div t-attf-class="form-group #{error.get('street') and 'has-error' or ''} col-lg-6">
-                    <label class="control-label" for="street" style="font-weight: normal">Street1</label>
+                    <label class="control-label" for="street">Calle</label>
                     <input type="text" name="street" class="form-control" t-att-value="checkout.get('street')"/>
                 </div>
             </xpath>
-
+            <xpath expr="//form[@action='/shop/confirm_order']/div/div/div[@class='row']/div[11]" position="replace"/>
             <xpath expr="//form[@action='/shop/confirm_order']/div/div/div[@class='row']/div" position="replace">
                 <div t-attf-class="form-group #{error.get('name') and 'has-error' or ''} col-lg-12">
                       <label class="control-label" for="contact_name">Your Name</label>
@@ -25,7 +57,7 @@
                       <input type="checkbox" name="is_company" t-att-value="checkout.get('is_company')"/>
                 </div>
                 <div t-attf-class="form-group col-lg-6">
-                      <label class="control-label" for="comment" style="font-weight: normal">Factura/Boleta</label>
+                      <label class="control-label" for="comment">Factura/Boleta</label>
                       <select class="form-control" name="comment" value="boleta">
                           <option value="boleta" select="select">Boleta</option>
                           <option value="factura">Factura</option>
@@ -33,10 +65,11 @@
                 </div>
             </xpath>
             <xpath expr="//label[@for='vat']" position="replace">
-                <label class="control-label" for="vat" style="font-weight: normal">RUT</label>
+                <label class="control-label" for="vat">RUT</label>
             </xpath>
             <!-- country default -->
             <xpath expr="//div/select[@name='country_id']" position="replace">
+                <input type="hidden" name="current_user" t-att-value="request.env.user.name"/>
                 <select name="country_id" class="form-control">
                   <option value="">Country...</option>
                   <t t-foreach="countries or []" t-as="country">
@@ -46,18 +79,22 @@
                   </t>
                 </select>
             </xpath>
+            <!-- <xpath expr="//form[@action='/shop/confirm_order']/div/div/div[@class='row']/div[13]" position="replace">-->
             <xpath expr="//div/select[@name='state_id']" position="replace">
-                <select name="state_id" class="form-control">
-                    <option value="">seleccione su comuna...</option>
-                    <t t-foreach="states.sorted(key=lambda b: b.name) or []" t-as="state">
-                        <option t-att-value="state.id" style="display:none;"
-                                t-att-data-country_id="state.country_id.id"
-                                t-att-data-type="normal"
-                                t-att-value-selected="state.id == checkout.get('state_id')">
-                            <t t-esc="state.name"/>
-                        </option>
-                    </t>
-                </select>
+                <!--<div t-attf-class="form-group col-lg-6">-->
+                    <label class="control-label" for="comment">/ Comuna</label>
+                    <select name="state_id" class="form-control">
+                        <option value="">Seleccione su Comuna...</option>
+                        <t t-foreach="states.sorted(key=lambda b: b.name) or []" t-as="state">
+                            <option t-att-value="state.id" style="display:none;"
+                                    t-att-data-country_id="state.country_id.id"
+                                    t-att-data-type="normal"
+                                    t-att-value-selected="state.id == checkout.get('state_id')">
+                                <t t-esc="state.name"/>
+                            </option>
+                        </t>
+                    </select>
+                <!--</div>-->
             </xpath>
             <xpath expr="//div/select[@name='shipping_country_id']" position="replace">
                 <select name="shipping_country_id" class="form-control" t-att-disabled="  'disabled' if shipping_id &gt;= 0 else ''">
@@ -82,6 +119,11 @@
                         </option>
                     </t>
                 </select>
+            </xpath>
+            <xpath expr="//a[@class='btn btn-default btn-primary pull-right mb32 a-submit']" position="replace">
+                <a id="sendit" class="btn btn-default btn-primary pull-right mb32 a-submit">
+                    Confirmar <span class="fa fa-long-arrow-right"/>
+                </a>
             </xpath>
         </template>
     </data>

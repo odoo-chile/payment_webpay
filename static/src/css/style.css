@@ -1,0 +1,17 @@
+#alert1{
+    display: none;
+}
+#alert2{
+    display: none;
+}
+#alert3{
+    display: none;
+}
+
+.form-box{
+    color: aliceblue;
+    border-style: solid;
+    border-radius: 6px;
+    padding-top: 9px;
+    padding-bottom: 110px;
+}

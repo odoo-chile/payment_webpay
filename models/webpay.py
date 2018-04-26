@@ -276,9 +276,3 @@ class PaymentTxWebpay(models.Model):
             _logger.warning(error)
             res.update(state='error', state_message=error)
             return tx.write(res)
-
-
-'''
-class PaymentMethod(models.Model):
-    _inherit = 'payment.method'
-'''

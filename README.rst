@@ -1,5 +1,12 @@
-# Pasarela de pagos Webpay para Odoo
+Webpay Payment Gateway
+======================
 
+Basado en payment_webpay from https://github.com/dansanti/payment_webpay.git
+
+Mejoras Incorporadas
+--------------------
+
+- Compatible con modulos del backend partner_vat_unique y tko_
 - Nos basamos en payment_paypal y payment_ogone
 - Funcional
 - Falta enviar Detalle completo, solamente se está enviando detalle demo
